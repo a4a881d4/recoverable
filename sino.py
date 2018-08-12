@@ -4,10 +4,11 @@ from gcd import exGCD
 class Sino:
 	def __init__(self,p):
 		self.p = p
-		self.r = 0
+		self.r = -1
 	def put(self,a):
 		self.r = a%self.p
 		return self
+
 	@staticmethod
 	def fromList(p):
 		return [Sino(pi) for pi in p]
@@ -76,7 +77,7 @@ class Sino:
 		for i in range(n):
 			pi = random.choice(p)
 			R = Sino.error(R,pi,random.randint(0,pi-1))
-			print "add error",pi
+			# print "add error",pi
 		return R
 
 class Sino2(Sino):
@@ -97,7 +98,7 @@ class Sino2(Sino):
 	
 	@staticmethod
 	def fromList(p):
-		return [Sino2(p0,p1) for (p0,p1) in zip(p,p[1:]+p[-1:])]
+		return [Sino2(p0,p1) for (p0,p1) in zip(p,p[1:]+p[0:1])]
 	
 	@staticmethod
 	def checkList(R):
@@ -109,7 +110,25 @@ class Sino2(Sino):
 		a = R[-1].check(R[0])
 		if a!=None:
 			r.append(a)
-		return r	
+		return r
+
+
+class Sinos(Sino):
+	PrimeList = []
+	def __init__(self,ps):
+		self.pset = set([p for p in Sinos.PrimeList if (ps%p) == 0 ])
+		Sino.__init__(self,ps)
+
+	def __repr__(self):
+		return str(self.r)+'|'+".".join([str(p) for p in self.pset])+"("+str(self.p)+")"
+
+	@staticmethod
+	def fromSino(s):
+		return Sinos(s.p).put(s.r)
+
+	@staticmethod
+	def merge(a,b):
+		return Sinos.fromSino(Sino.merge(a,b))	
 
 def main():
 	import random
@@ -132,7 +151,9 @@ def main():
 	print r
 	R = Sino.synthesize(r)
 	print R
-	
+	Sinos.PrimeList = primeNumber()[-32:]
+	rs = [Sinos.fromSino(s) for s in r]
+	print Sinos.merge(rs[0],rs[1])
 
 if __name__ == '__main__':
 	main()
